@@ -1,0 +1,9 @@
+package cn.qphone
+
+/**
+ * Hello world!
+ *
+ */
+object App extends Application {
+  println( "Hello World!" )
+}
