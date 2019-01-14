@@ -4,96 +4,129 @@
   <artifactId>trafficAnalysis</artifactId>
   <version>1.0-SNAPSHOT</version>
   <inceptionYear>2008</inceptionYear>
-  <properties>
-    <scala.version>2.7.0</scala.version>
-  </properties>
-
-  <repositories>
-    <repository>
-      <id>scala-tools.org</id>
-      <name>Scala-Tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>scala-tools.org</id>
-      <name>Scala-Tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
-    </pluginRepository>
-  </pluginRepositories>
-
   <dependencies>
+    <!-- zookeeper依赖 -->
     <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>${scala.version}</version>
+      <groupId>org.apache.zookeeper</groupId>
+      <artifactId>zookeeper</artifactId>
+      <version>3.4.7</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!--Hadoop依赖-->
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-client</artifactId>
+      <version>2.7.3</version>
+    </dependency>
+
+    <!--0..Hive依赖-->
+    <dependency>
+      <groupId>org.apache.hive</groupId>
+      <artifactId>hive-exec</artifactId>
+      <version>2.3.3</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!--Hbase依赖-->
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-client</artifactId>
+      <version>2.0.0</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!--Spark依赖-->
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-sql_2.11</artifactId>
+      <version>2.3.0</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.4</version>
-      <scope>test</scope>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-core_2.11</artifactId>
+      <version>2.3.0</version>
     </dependency>
     <dependency>
-      <groupId>org.specs</groupId>
-      <artifactId>specs</artifactId>
-      <version>1.2.5</version>
-      <scope>test</scope>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-streaming_2.11</artifactId>
+      <version>2.3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.janino</groupId>
+      <artifactId>janino</artifactId>
+      <version>3.0.8</version>
+    </dependency>
+
+    <!--kafka&spark依赖-->
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-sql-kafka-0-10_2.11</artifactId>
+      <version>2.3.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-streaming-kafka-0-10_2.11</artifactId>
+      <version>2.3.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>0.11.0.0</version>
+    </dependency>
+
+    <!--scala中的akka依赖-->
+    <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-actor_2.11</artifactId>
+      <version>2.3.14</version>
     </dependency>
   </dependencies>
 
   <build>
-    <sourceDirectory>src/main/scala</sourceDirectory>
-    <testSourceDirectory>src/test/scala</testSourceDirectory>
     <plugins>
+      <!--maven编译java的相关设置-->
       <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.7.0</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <!-- maven编译scala的相关设置 -->
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>3.4.1</version>
         <executions>
           <execution>
+            <id>scala-compile-first</id>
+            <phase>process-resources</phase>
             <goals>
+              <goal>add-source</goal>
               <goal>compile</goal>
-              <goal>testCompile</goal>
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <scalaVersion>${scala.version}</scalaVersion>
-          <args>
-            <arg>-target:jvm-1.5</arg>
-          </args>
-        </configuration>
       </plugin>
+      <!--maven打jar包（无论是scala还是java）时候指定主类的插件-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
+        <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-          <downloadSources>true</downloadSources>
-          <buildcommands>
-            <buildcommand>ch.epfl.lamp.sdt.core.scalabuilder</buildcommand>
-          </buildcommands>
-          <additionalProjectnatures>
-            <projectnature>ch.epfl.lamp.sdt.core.scalanature</projectnature>
-          </additionalProjectnatures>
-          <classpathContainers>
-            <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER</classpathContainer>
-            <classpathContainer>ch.epfl.lamp.sdt.launching.SCALA_CONTAINER</classpathContainer>
-          </classpathContainers>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>org.qianfeng.bigdata.mapreduce.checkrandom</mainClass>
+            </manifest>
+          </archive>
         </configuration>
       </plugin>
     </plugins>
   </build>
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <configuration>
-          <scalaVersion>${scala.version}</scalaVersion>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>
