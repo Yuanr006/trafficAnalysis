@@ -40,5 +40,5 @@ package cn.qphone.spark.bean
      _areaName = value
    }
     //toString
-   override def toString = s"Area($_areaId, $_areaName, $areaId, $areaName)"
+   override def toString = s"Area($areaId, $areaName)"
  }
