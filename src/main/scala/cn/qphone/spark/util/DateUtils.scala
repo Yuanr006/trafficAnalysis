@@ -7,9 +7,10 @@ import java.util.Date
   * 日期时间工具类
   */
 object DateUtils {
-  val TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
-  val DATE_FORMAT = "yyyy-MM-dd"
-  val DATEKEY_FORMAT = "yyyyMMdd"
+  val TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+  val DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
+  val DATEKEY_FORMAT = new SimpleDateFormat("yyyyMMdd")
+  val MINUTE_FORMAT = new SimpleDateFormat("yyyyMMddHHmm");
 
   def main(args: Array[String]): Unit = {
     print(getRangeTime("2018-1-1 1:59"))
@@ -24,8 +25,8 @@ object DateUtils {
     * @return 判断结果
     */
   def before(time1: String, time2: String): Boolean = {
-    val dateTime1 = new SimpleDateFormat(TIME_FORMAT).parse(time1)
-    val dateTime2 = new SimpleDateFormat(TIME_FORMAT).parse(time2)
+    val dateTime1 = TIME_FORMAT.parse(time1)
+    val dateTime2 = TIME_FORMAT.parse(time2)
     if (dateTime1.before(dateTime2)) {
       true
     } else {
@@ -43,12 +44,12 @@ object DateUtils {
   def after(time1: String, time2: String): Boolean = {
     var t1 = time1
     var t2 = time2
-    if(t1 == null||t2 == null || t1.equals("null")||t2.equals("null") || t1.equals("")||t2.equals("")){
+    if (t1 == null || t2 == null || t1.equals("null") || t2.equals("null") || t1.equals("") || t2.equals("")) {
       t1 = "2000-01-01 00:00:00"
       t2 = "2000-01-01 00:00:00"
     }
-    val dateTime1 = new SimpleDateFormat(TIME_FORMAT).parse(t1)
-    val dateTime2 = new SimpleDateFormat(TIME_FORMAT).parse(t2)
+    val dateTime1 = TIME_FORMAT.parse(t1)
+    val dateTime2 = TIME_FORMAT.parse(t2)
     if (dateTime1.after(dateTime2)) {
       true
     } else {
@@ -66,13 +67,13 @@ object DateUtils {
   def minus(time1: String, time2: String): Int = {
     var t1 = time1
     var t2 = time2
-    if(t1 == null||t2 == null || t1.equals("null")||t2.equals("null") || t1.equals("")||t2.equals("")){
+    if (t1 == null || t2 == null || t1.equals("null") || t2.equals("null") || t1.equals("") || t2.equals("")) {
       t1 = "2000-01-01 00:00:00"
       t2 = "2000-01-01 00:00:00"
     }
     try {
-      val datetime1 = new SimpleDateFormat(TIME_FORMAT).parse(t1)
-      val datetime2 = new SimpleDateFormat(TIME_FORMAT).parse(t2)
+      val datetime1 = TIME_FORMAT.parse(t1)
+      val datetime2 = TIME_FORMAT.parse(t2)
       val millisecond = datetime1.getTime - datetime2.getTime
       Integer.valueOf(String.valueOf(millisecond / 1000))
     } catch {
@@ -92,7 +93,7 @@ object DateUtils {
     */
   def getDateHour(datetime: String): String = {
     var t1 = datetime
-    if(t1 == null || t1.equals("null")|| t1.equals("")){
+    if (t1 == null || t1.equals("null") || t1.equals("")) {
       t1 = "2000-01-01 00:00:00"
     }
     val date = t1.split(" ")(0)
@@ -107,7 +108,7 @@ object DateUtils {
     * @return 当天日期
     */
   def getTodayDate: String = {
-    DATE_FORMAT.format(new Date)
+    DATE_FORMAT.format(System.currentTimeMillis())
   }
 
   /**
@@ -158,7 +159,7 @@ object DateUtils {
 
   def parseTime(time: String): Date = {
     try {
-      new SimpleDateFormat(TIME_FORMAT).parse(time)
+      TIME_FORMAT.parse(time)
     }
     catch {
       case e: Exception =>
@@ -189,11 +190,11 @@ object DateUtils {
 
   def parseDateKey(datekey: String): Date = {
     var t1 = datekey
-    if(t1 == null || t1.equals("null")|| t1.equals("")){
+    if (t1 == null || t1.equals("null") || t1.equals("")) {
       t1 = "2000-01-01 00:00:00"
     }
     try {
-      new SimpleDateFormat(DATEKEY_FORMAT).parse(t1)
+      DATEKEY_FORMAT.parse(t1)
     } catch {
       case e: Exception =>
         e.printStackTrace
@@ -211,7 +212,8 @@ object DateUtils {
     * @return yyyyMMddHHmm --201701012301
     */
   def formatTimeMinute(date: Date): String = {
-    new SimpleDateFormat("yyyyMMddHHmm").format(date)
+
+    MINUTE_FORMAT.format(date)
   }
 
   /**
@@ -226,7 +228,7 @@ object DateUtils {
     val hour = dateTime.split(" ")(1).split(":")(0)
     val minute = StringUtils.convertStringtoInt(dateTime.split(" ")(1).split(":")(1))
     if (minute + (5 - minute % 5) == 60) {
-       date + " " + hour + ":" + StringUtils.fulfuill((minute - (minute % 5)) + "") +
+      date + " " + hour + ":" + StringUtils.fulfuill((minute - (minute % 5)) + "") +
         "~" + date + " " + StringUtils.fulfuill((hour.toInt + 1) + "") + ":00"
     }
     date + " " + hour + ":" + StringUtils.fulfuill((minute - (minute % 5)) + "") +
