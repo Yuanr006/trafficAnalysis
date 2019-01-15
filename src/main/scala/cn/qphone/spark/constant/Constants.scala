@@ -5,7 +5,7 @@ package cn.qphone.spark.constant
   * @Date: 2019/1/14 22:21
   * @Description: ${Description}
   */
-trait Constants {
+object Constants {
   /**
     * 项目配置相关的常量
     */

@@ -1,26 +1,10 @@
 package cn.qphone.spark.dao.impl
 
-import cn.qphone.spark.bean.{MonitorState, TopNMonitor2CarCount, TopNMonitorDetailInfo}
+/**
+  * @Auther: zhuguangyuan 1159814737@qq.com
+  * @Date: 2019/1/15 19:53
+  * @Description: ${Description}
+  */
+class RandomExtractDAOImpl {
 
-trait IMonitorDAO {
-  /**
-    * 卡口流量topN批量插入到数据库
-    * @param topNMonitor2CarCounts
-    */
-  def insertBatchTopN(topNMonitor2CarCounts:List[TopNMonitor2CarCount] )
-
-  /**
-    * 卡口下车辆具体信息插入到数据库
-    * @param monitorDetailInfos
-    */
-  def insertBatchMonitorDetails(monitorDetailInfos:List[TopNMonitorDetailInfo])
-
-
-  /**
-    * 卡口状态信息插入到数据库
-    * @param monitorState
-    */
-  def insertMonitorState(monitorState:MonitorState );
-
-  def insertBatchTop10Details(topNMonitorDetailInfos:List[TopNMonitorDetailInfo] );
 }

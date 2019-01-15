@@ -12,14 +12,14 @@ import org.apache.spark.sql.SQLContext
   * Spark工具类
   *
   */
-object SparkUtils extends Constants {
+object SparkUtils {
   /**
     * 根据当前是否本地测试的配置，决定 如何设置SparkConf的master
-    */
-  def setMaster(conf: SparkConf): Unit = {
-    val local = ConfigurationManager.getBoolean(SPARK_LOCAL)
-    if (local) conf.setMaster("local")
-  }
+//    */
+//  def setMaster(conf: SparkConf): Unit = {
+//    val local = ConfigurationManager.getBoolean(SPARK_LOCAL)
+//    if (local) conf.setMaster("local")
+//  }
 
   /**
     * 获取SQLContext
@@ -48,8 +48,8 @@ object SparkUtils extends Constants {
     * @param sc
     * @param sqlContext
     */
-  def mockData(sc: JavaSparkContext, sqlContext: SQLContext): Unit = {
-    val local = ConfigurationManager.getBoolean(SPARK_LOCAL)
+//  def mockData(sc: JavaSparkContext, sqlContext: SQLContext): Unit = {
+//    val local = ConfigurationManager.getBoolean(SPARK_LOCAL)
 
     /**
       * 如何local为true  说明在本地测试  应该生产模拟数据    RDD-》DataFrame-->注册成临时表0
@@ -58,6 +58,6 @@ object SparkUtils extends Constants {
     //    if (local) {
     //      MockData.mock(sc, sqlContext)
     //    }
-  }
+ // }
 }
 
