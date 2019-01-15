@@ -6,16 +6,12 @@ import cn.qphone.spark.bean.{RandomExtractCar, RandomExtractMonitorDetail, Task}
 import cn.qphone.spark.jdbc.JDBCHelper
 import cn.qphone.spark.jdbc.JDBCHelper.QueryCallback
 
-object TaskDAOImpl extends ITaskDAO {
+class TaskDAOImpl extends ITaskDAO {
   override def findTaskById(taskId: Long): Task = {
     val task = new Task();
-
     val sql = "SELECT * FROM task WHERE task_id = ?";
-
     val params = Array[String](taskId.toString)
-
     JDBCHelper.executeQuery(sql, params, new QueryCallback() {
-
       @Override
       def process(rs:ResultSet) {
         if(rs.next()) {
@@ -27,7 +23,6 @@ object TaskDAOImpl extends ITaskDAO {
           val taskType = rs.getString(6)
           val taskStatus = rs.getString(7)
           val taskParam = rs.getString(8)
-
           task.taskId_=(taskid)
           task.taskName_=(taskName)
           task.createTime_=(createTime)
