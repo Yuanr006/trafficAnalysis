@@ -1,14 +1,9 @@
 package cn.qphone.spark.mockData
-
-import java.text.SimpleDateFormat
-
 import cn.qphone.spark.util.{DateUtils, StringUtils}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
-
-import scala.collection.immutable.HashMap
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
@@ -18,7 +13,7 @@ import scala.util.Random
   * @Date: 2019/1/14 20:27
   * @Description: 模拟生成离线数据
   */
-object Mockdata {
+object MockData {
   /**
     * 模拟数据 数据格式如下
     * 日期  卡口ID        摄像头编号  车牌号  拍摄时间      车速   道路ID     区域ID
