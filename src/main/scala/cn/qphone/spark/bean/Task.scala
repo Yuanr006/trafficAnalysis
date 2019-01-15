@@ -1,6 +1,5 @@
 package cn.qphone.spark.bean
 
-import scala.beans.BeanProperty
 
 class Task {
   def this(id:Long,tn:String,ct:String,st:String,ft:String,tt:String,ts:String,tp:String) {

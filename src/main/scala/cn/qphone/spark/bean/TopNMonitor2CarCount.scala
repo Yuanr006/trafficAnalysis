@@ -1,7 +1,7 @@
 package cn.qphone.spark.bean
 
 class TopNMonitor2CarCount {
-  def this(id:Long,mi:String,cc:String) {
+  def this(id:Long,mi:String,cc:Int) {
     this
     taskId= id
     monitorId=mi
@@ -24,11 +24,11 @@ class TopNMonitor2CarCount {
     _monitorId = value
   }
 
-  private[this] var _carCount: String = ""
+  private[this] var _carCount: Int = 0
 
-  def carCount: String = _carCount
+  def carCount: Int = _carCount
 
-  def carCount_=(value: String): Unit = {
+  def carCount_=(value: Int): Unit = {
     _carCount = value
   }
 

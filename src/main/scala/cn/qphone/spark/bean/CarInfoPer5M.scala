@@ -1,6 +1,5 @@
 package cn.qphone.spark.bean
 
-import scala.beans.BeanProperty
 
 class CarInfoPer5M {
  def this(id:Long,moniId:String,car:String) {
