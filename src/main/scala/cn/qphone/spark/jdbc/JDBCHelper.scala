@@ -73,7 +73,7 @@ object JDBCHelper extends {
     releaseConn(conn)
     rtn
   }
-  def executeQuery(sql:String,params:Array[String]): ResultSet ={
+  def executeQuery(sql:String,params:Array[String],callback:QueryCallback): ResultSet ={
     val conn = getJdbcConn()
     conn.setAutoCommit(false)
     val prep = conn.prepareStatement(sql)
@@ -83,7 +83,7 @@ object JDBCHelper extends {
       }
     }
     val rtn = prep.executeQuery()
-    conn.commit()
+    callback.process(rtn)
     releaseConn(conn)
     rtn
   }
@@ -104,6 +104,21 @@ object JDBCHelper extends {
       releaseConn(conn)
       rtn
     }
+  }
+  /**
+    * 静态内部类：查询回调接口
+    * @author Administrator
+    *
+    */
+  trait QueryCallback {
+
+    /**
+      * 处理查询结果
+      * @param rs
+      * @throws Exception
+      */
+    def process(rs:ResultSet )
+
   }
 }
 
