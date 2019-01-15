@@ -28,17 +28,17 @@ object SparkUtils extends Constants {
     * @param sc
     * @return
     */
-
-
-  def getSQLContext(sc: JavaSparkContext): SQLContext = {
-    val local = ConfigurationManager.getBoolean(SPARK_LOCAL)
-    if (local) {
-      new SQLContext(sc)
-    }
-    else {
-      new Nothing(sc)
-    }
-  }
+//
+//
+//  def getSQLContext(sc: JavaSparkContext): SQLContext = {
+//    val local = ConfigurationManager.getBoolean(SPARK_LOCAL)
+//    if (local) {
+//      new SQLContext(sc)
+//    }
+////    else {
+////      new HiveContext(sc)
+////    }
+//  }
 
 
   /**
