@@ -1,3 +1,4 @@
+import cn.qphone.spark.conf.ConfigurationManager
 import com.alibaba.fastjson.{JSON, JSONObject}
 
 
