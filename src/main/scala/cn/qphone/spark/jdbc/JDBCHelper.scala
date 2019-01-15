@@ -1,4 +1,4 @@
-package cn.qphone.jdbc
+package cn.qphone.spark.jdbc
 
 import java.sql.{Connection, DriverManager, ResultSet}
 import java.util
@@ -9,7 +9,7 @@ import java.util.Properties
   * @author xjw
   *
   */
-object JDBCHelper extends {
+object JDBCHelper {
   val props = getProperties()
   private val max = Integer.parseInt(props.getProperty("jdbc.datasource.size")) //连接池连接总数
   private val connectionNum = Integer.parseInt(props.getProperty("jdbc.initconnection.num")) //每次产生连接数
@@ -73,7 +73,7 @@ object JDBCHelper extends {
     releaseConn(conn)
     rtn
   }
-  def executeQuery(sql:String,params:Array[String]): ResultSet ={
+  def executeQuery(sql:String,params:Array[String],callback:QueryCallback): ResultSet ={
     val conn = getJdbcConn()
     conn.setAutoCommit(false)
     val prep = conn.prepareStatement(sql)
@@ -83,7 +83,7 @@ object JDBCHelper extends {
       }
     }
     val rtn = prep.executeQuery()
-    conn.commit()
+    callback.process(rtn)
     releaseConn(conn)
     rtn
   }
@@ -105,5 +105,20 @@ object JDBCHelper extends {
       rtn
     }
   }
-}
 
+  /**
+    * 静态内部类：查询回调接口
+    * @author Administrator
+    *
+    */
+  trait QueryCallback {
+
+    /**
+      * 处理查询结果
+      * @param rs
+      * @throws Exception
+      */
+    def process(rs:ResultSet )
+
+  }
+}
