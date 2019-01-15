@@ -93,14 +93,7 @@ object ConfigurationManager {
     */
   def getInteger(key: String): Integer = {
     val value = getProperty(key)
-    try {
-      value.toInt
-    }
-    catch {
-      case e: Exception =>
-        e.printStackTrace
-    }
-    0
+    value.toInt
   }
 
   /**
@@ -111,13 +104,7 @@ object ConfigurationManager {
     */
   def getBoolean(key: String): Boolean = {
     val value = getProperty(key)
-    try
-      value.toBoolean
-    catch {
-      case e: Exception =>
-        e.printStackTrace
-    }
-    false
+    value.toBoolean
   }
 
   /**
@@ -128,11 +115,6 @@ object ConfigurationManager {
     */
   def getLong(key: String): Long = {
     val value:String = getProperty(key)
-    try {
-      value.toLong
-    }catch {
-      case e:Exception =>e.printStackTrace
-    }
-    0L
+    value.toLong
   }
 }
