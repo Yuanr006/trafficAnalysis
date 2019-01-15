@@ -7,9 +7,6 @@ import cn.qphone.spark.jdbc.JDBCHelper
 import cn.qphone.spark.jdbc.JDBCHelper.QueryCallback
 
 object TaskDAOImpl extends ITaskDAO {
-  def main(args: Array[String]): Unit = {
-    println(findTaskById(2))
-  }
   override def findTaskById(taskId: Long): Task = {
     val task = new Task();
 
