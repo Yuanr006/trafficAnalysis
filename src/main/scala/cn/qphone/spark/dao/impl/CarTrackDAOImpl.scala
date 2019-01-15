@@ -1,4 +1,4 @@
-package cn.qphone.spark.dao
+package cn.qphone.spark.dao.impl
 
 import cn.qphone.spark.bean.Area
 

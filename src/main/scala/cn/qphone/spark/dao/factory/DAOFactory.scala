@@ -1,6 +1,7 @@
 package cn.qphone.spark.dao.factory
 
-import cn.qphone.spark.dao.{ITaskDAO, TaskDAOImpl}
+import cn.qphone.spark.dao.impl.TaskDAOImpl
+import cn.qphone.spark.dao.ITaskDAO
 
 /**
   * @Auther: zhuguangyuan 1159814737@qq.com

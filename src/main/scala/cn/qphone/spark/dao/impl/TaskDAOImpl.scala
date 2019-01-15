@@ -1,8 +1,9 @@
-package cn.qphone.spark.dao
+package cn.qphone.spark.dao.impl
 
 import java.sql.ResultSet
 
 import cn.qphone.spark.bean.{RandomExtractCar, RandomExtractMonitorDetail, Task}
+import cn.qphone.spark.dao.ITaskDAO
 import cn.qphone.spark.jdbc.JDBCHelper
 import cn.qphone.spark.jdbc.JDBCHelper.QueryCallback
 
