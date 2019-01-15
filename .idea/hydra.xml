@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="HydraSettings">
-    <option name="hydraStorePath" value="E:\IDEAspace\g12\xjw\.hydra\idea" />
+    <option name="hydraStorePath" value="C:\Users\Administrator\Desktop\spark项目（无视频）\180315 Spark day07\04 - 代码\trafficAnalysis\.hydra\idea" />
     <option name="noOfCores" value="2" />
-    <option name="projectRoot" value="E:\IDEAspace\g12\xjw" />
+    <option name="projectRoot" value="C:\Users\Administrator\Desktop\spark项目（无视频）\180315 Spark day07\04 - 代码\trafficAnalysis" />
     <option name="sourcePartitioner" value="auto" />
   </component>
 </project>
