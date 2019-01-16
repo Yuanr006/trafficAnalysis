@@ -10,11 +10,12 @@ import scala.util.Random
 object MockRealTimeData extends Thread{
   final val random = new Random
   final val locations = Array[String]("鲁", "京", "京", "京", "沪", "京", "京", "深", "京", "京")
+  val prop = new Properties()
   def main(args: Array[String]): Unit = {
     //使用java.util.Properties类的对象来封装一些连接kafka必备的配置属性
     val kafkaProducerProperties = new Properties
     //指定broker的地址清单
-    kafkaProducerProperties.put("bootstrap.servers", "bigdata1:9092")
+    kafkaProducerProperties.put("bootstrap.servers", prop.getProperty("kafka.metadata.broker.list"))
     //必须设置，就算打算只发送值内容
     kafkaProducerProperties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
     //指定的类会将值序列化
