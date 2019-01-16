@@ -6,8 +6,7 @@ import cn.qphone.spark.dao.factory.DAOFactory
 import cn.qphone.spark.mockData.MockData
 import cn.qphone.spark.util.ParamUtils
 import com.alibaba.fastjson.{JSON, JSONObject}
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, SQLContext}
+import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -25,8 +24,6 @@ object MonitorFlowAnalyze{
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
     MockData.mock(sc, sqlContext)
-    val rdd1 = MockData.rdd1.cache()
-    val rdd2 = MockData.rdd2.cache()
     /**
       * 从配置文件my.properties中拿到spark.local.taskId.monitorFlow的taskId
       */
@@ -38,7 +35,7 @@ object MonitorFlowAnalyze{
     val task = taskDAO.findTaskById(taskId)
     val taskParamsJsonObject = JSON.parseObject(task.taskParams)
 //    monitorState(sqlContext,sc,taskParamsJsonObject,taskId)
-//    topnMonitorcarcount(sqlContext,sc,rdd1,taskParamsJsonObject,taskId)
+    topnMonitorcarcount(sqlContext,sc,taskParamsJsonObject,taskId)
   }
   def monitorState(sqlContext:SQLContext,sc:SparkContext,taskParamsJsonObject:JSONObject,taskId:Int): Unit ={
     /**
@@ -92,22 +89,15 @@ object MonitorFlowAnalyze{
       ,abnormal_camera_count.value,acmi.value.substring(0,acmi.value.length-1))
   }
   def saveMonitorState(taskId:Long,nmc:Long,ncc:Long,amc:Long,acc:Long,acmi:String): Unit ={
-    /**
-      * 将卡扣状态信息存入数据库
-      */
     val monitorState = new MonitorState(taskId,nmc.toString,ncc.toString,amc.toString,acc.toString,acmi)
     val monitorDAO = DAOFactory.getMonitorDAO()
     monitorDAO.insertMonitorState(monitorState)
   }
-  def topnMonitorcarcount(sqlContext:SQLContext,sc:SparkContext,rdd1:RDD[Row],taskParamsJsonObject:JSONObject,taskId:Int): Unit ={
-    /**
-      * 通过Constants.FIELD_TOP_NUM从数据库JSON对象中获取topnum
-      */
+  def topnMonitorcarcount(sqlContext:SQLContext,sc:SparkContext,taskParamsJsonObject:JSONObject,taskId:Int): Unit ={
     val topnnum = ParamUtils.getParam(taskParamsJsonObject, Constants.FIELD_TOP_NUM).toInt
+    val sql = "SELECT * FROM monitor_flow_action"
+    val rdd1 = sqlContext.sql(sql).rdd
     val topn_monitorcarcount = rdd1.map(x=> (x.get(1),x)).groupByKey().map(x=>(x._2.size,x._1.toString)).top(topnnum).map(x=>(x._2,x._1))
-    /**
-      * 获取topn
-      */
     val array =ArrayBuffer[TopNMonitor2CarCount]()
     topn_monitorcarcount.foreach(x=>{
       val topNMonitor2CarCount = new TopNMonitor2CarCount(taskId,x._1,x._2.toString)
@@ -116,9 +106,6 @@ object MonitorFlowAnalyze{
     saveTopnMonitorcarcount(array)
   }
   def saveTopnMonitorcarcount(topn_monitorcarcount:ArrayBuffer[TopNMonitor2CarCount]): Unit ={
-    /**
-      * 将topn传入数据库
-      */
     val monitorDAO = DAOFactory.getMonitorDAO()
     monitorDAO.insertBatchTopN(topn_monitorcarcount.toList)
   }
