@@ -27,18 +27,18 @@ object MockRealTimeData extends Thread{
       producer = new KafkaProducer(kafkaProducerProperties)
       while (true) {
         val date = DateUtils.getTodayDate
-        var baseActionTime = date + " " + StringUtils.fulfuill(random.nextInt(23) + "")
-        baseActionTime = date + " " + StringUtils.fulfuill((Integer.parseInt(baseActionTime.split(" ")(1)) + 1) + "")
+        var baseActionTime = date + " " + StringUtils.fulfuill(2, random.nextInt(24).toString)
+        baseActionTime = baseActionTime+":"+ StringUtils.fulfuill(2,random.nextInt(60).toString) + ":"+StringUtils.fulfuill(2,random.nextInt(60).toString);
         //拍摄时间
-        val actionTime = baseActionTime + ":" + StringUtils.fulfuill(random.nextInt(60) + "") + ":" + StringUtils.fulfuill(random.nextInt(60) + "")
+        val actionTime = baseActionTime + ":" + StringUtils.fulfuill(2, random.nextInt(60).toString) + ":" + StringUtils.fulfuill(2, random.nextInt(60).toString)
         //卡口id
         val monitorId = StringUtils.fulfuill(4, random.nextInt(9) + "")
         //车牌号码
         val car = locations(random.nextInt(10)) + (65 + random.nextInt(26)).asInstanceOf[Char] + StringUtils.fulfuill(5, random.nextInt(99999) + "")
         //车速
-        val speed = random.nextInt(260) + ""
+        val speed = StringUtils.fulfuill(3,random.nextInt(260) + "")
         //道路id
-        val roadId = random.nextInt(50) + 1 + ""
+        val roadId = StringUtils.fulfuill(2, random.nextInt(50) + 1 + "")
         //摄像头编号
         val cameraId = StringUtils.fulfuill(5, random.nextInt(9999) + "")
         //区域id
