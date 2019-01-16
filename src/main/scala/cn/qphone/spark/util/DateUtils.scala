@@ -1,6 +1,8 @@
 package cn.qphone.spark.util
 
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDateTime, ZoneId}
 import java.util.Date
 
 /**
@@ -11,6 +13,7 @@ object DateUtils {
   val DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd")
   val DATEKEY_FORMAT = new SimpleDateFormat("yyyyMMdd")
   val MINUTE_FORMAT = new SimpleDateFormat("yyyyMMddHHmm");
+  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
   def main(args: Array[String]): Unit = {
     print(getRangeTime("2018-1-1 1:59"))
@@ -82,8 +85,8 @@ object DateUtils {
         0
     }
 
-  }
 
+  }
 
   /**
     * 获取年月日和小时
@@ -234,4 +237,19 @@ object DateUtils {
     date + " " + hour + ":" + StringUtils.fulfuill((minute - (minute % 5)) + "") +
       "~" + date + " " + hour + ":" + StringUtils.fulfuill((minute + (5 - minute % 5)) + "")
   }
+  /**
+    *
+    * @param dateTime yyyy-MM-dd HH:mm:ss
+    * @return
+    */
+  def time2Stamp(time:String):Long={
+   1L
+  }
+  //获取指定日期的秒
+ def getSecondsByTime( time:String):Long = {
+    LocalDateTime.parse(time,formatter)
+      .atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
+
+  }
+
 }
