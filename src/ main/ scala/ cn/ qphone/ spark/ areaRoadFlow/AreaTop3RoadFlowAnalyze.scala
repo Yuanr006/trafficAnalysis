@@ -1,4 +1,4 @@
-packagpackage cn.qphone.spark.areaRoadFlow
+package cn.qphone.spark.areaRoadFlow
 
 import cn.qphone.spark.bean.Task
 import cn.qphone.spark.conf.ConfigurationManager
