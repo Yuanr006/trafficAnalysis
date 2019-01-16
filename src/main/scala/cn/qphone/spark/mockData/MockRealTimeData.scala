@@ -26,7 +26,7 @@ object MockRealTimeData extends Thread{
       producer = new KafkaProducer(kafkaProducerProperties)
       while (true) {
         val date = DateUtils.getTodayDate
-        var baseActionTime = date + " " + StringUtils.fulfuill(random.nextInt(24) + "")
+        var baseActionTime = date + " " + StringUtils.fulfuill(random.nextInt(23) + "")
         baseActionTime = date + " " + StringUtils.fulfuill((Integer.parseInt(baseActionTime.split(" ")(1)) + 1) + "")
         //拍摄时间
         val actionTime = baseActionTime + ":" + StringUtils.fulfuill(random.nextInt(60) + "") + ":" + StringUtils.fulfuill(random.nextInt(60) + "")
