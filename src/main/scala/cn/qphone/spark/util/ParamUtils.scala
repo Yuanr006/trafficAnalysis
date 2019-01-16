@@ -1,4 +1,4 @@
-package org.qphone.scala.Utils
+package cn.qphone.spark.util
 import cn.qphone.spark.conf.ConfigurationManager
 import cn.qphone.spark.constant.Constants
 import com.alibaba.fastjson.JSONObject

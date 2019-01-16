@@ -1,5 +1,4 @@
 package cn.qphone.spark.util
-
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId}

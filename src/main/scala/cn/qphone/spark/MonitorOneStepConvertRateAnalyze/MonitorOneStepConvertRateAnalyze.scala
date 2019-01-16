@@ -4,13 +4,12 @@ import cn.qphone.spark.constant.Constants
 import cn.qphone.spark.dao.ITaskDAO
 import cn.qphone.spark.dao.impl.TaskDAOImpl
 import cn.qphone.spark.mockData.MockData
-import cn.qphone.spark.util.DateUtils
+import cn.qphone.spark.util.{DateUtils, NumberUtils, ParamUtils}
 import com.alibaba.fastjson.{JSON, JSONObject}
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Row, SQLContext}
-import org.qphone.scala.Utils.{NumberUtils, ParamUtils}
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}

@@ -5,15 +5,15 @@ import cn.qphone.spark.conf.ConfigurationManager
 import cn.qphone.spark.constant.Constants
 import cn.qphone.spark.dao.ITaskDAO
 import cn.qphone.spark.dao.factory.DAOFactory
-import cn.qphone.spark.mockData.Mockdata
+import cn.qphone.spark.mockData.{MockData, Mockdata}
 import cn.qphone.spark.util.{ParamUtils, SparkUtils}
 import com.alibaba.fastjson.{JSON, JSONObject}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row, RowFactory, SQLContext}
 import org.apache.spark.{SparkConf, SparkContext}
+import org.qphone.scala.Utils.ParamUtils
 
-import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 /**
@@ -23,7 +23,7 @@ import scala.util.Random
   * 区域，道路流量排序         按照区域和道路进行分组
   *
   */
-object AreaTop3RoadFlowAnalyze extends Constants {
+object AreaTop3RoadFlowAnalyze  {
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf().setAppName("AreaTop3ProductSpark").set("spark.sql.shuffle.partitions", "1").setMaster("local[*]")
     System.setProperty("HADOOP_USER_NAME", "root")
@@ -43,9 +43,9 @@ object AreaTop3RoadFlowAnalyze extends Constants {
 //      elem.groupBy
 //    })
     sqlContext.udf.register("group_concat_distinct", new GroupConcatDistinctUDAF)
-    Mockdata.mock(sc, sqlContext)
+    MockData.mock(sc, sqlContext)
     val taskDAO: ITaskDAO = DAOFactory.getTaskDAO()
-    val taskid: Long = ParamUtils.getTaskIdFromArgs(args, SPARK_LOCAL_TASKID_TOPN_MONITOR_FLOW)
+    val taskid: Long = ParamUtils.getTaskIdFromArgs(args, Constants.SPARK_LOCAL_TASKID_TOPN_MONITOR_FLOW)
     val task: Task = taskDAO.findTaskById(taskid)
     if (task == null) {
       System.exit(-1)
@@ -156,7 +156,7 @@ object AreaTop3RoadFlowAnalyze extends Constants {
     */
   def generateTempRoadFlowBasicTable(sqlContext: SQLContext,
                                      areaId2DetailInfos: RDD[(String, Row)], areaId2AreaInfoRDD: RDD[(String, String)]) = {
-    println("111111111111111111111111111111111111111111111111")
+ //   println("111111111111111111111111111111111111111111111111")
     val tmp =areaId2DetailInfos.join(areaId2AreaInfoRDD).foreach(println(_))
    val tmpRowRDD: RDD[Row] = areaId2DetailInfos.join(areaId2AreaInfoRDD).map(x => {
      RowFactory.create(x._1.toString, x._2._2.toString, x._2._1(2).toString, x._2._1(0).toString, x._2._1(1).toString)
@@ -178,18 +178,18 @@ object AreaTop3RoadFlowAnalyze extends Constants {
     var url: String = null
     var user: String = null
     var password: String = null
-    var local: Boolean = ConfigurationManager.getBoolean(SPARK_LOCAL)
+    var local: Boolean = ConfigurationManager.getBoolean(Constants.SPARK_LOCAL)
     println("-------------------------------------")
     //获取Mysql数据库的url,user,password信息
     if (local) {
-      url = ConfigurationManager.getProperty(JDBC_URL)
-      user = ConfigurationManager.getProperty(JDBC_USER)
-      password = ConfigurationManager.getProperty(JDBC_PASSWORD)
+      url = ConfigurationManager.getProperty(Constants.JDBC_URL)
+      user = ConfigurationManager.getProperty(Constants.JDBC_USER)
+      password = ConfigurationManager.getProperty(Constants.JDBC_PASSWORD)
     }
     else {
-      url = ConfigurationManager.getProperty(JDBC_URL_PROD)
-      user = ConfigurationManager.getProperty(JDBC_USER_PROD)
-      password = ConfigurationManager.getProperty(JDBC_PASSWORD_PROD)
+      url = ConfigurationManager.getProperty(Constants.JDBC_URL_PROD)
+      user = ConfigurationManager.getProperty(Constants.JDBC_USER_PROD)
+      password = ConfigurationManager.getProperty(Constants.JDBC_PASSWORD_PROD)
     }
 
     val options: Map[String, String] = Map[String, String]("url" -> url,
@@ -215,8 +215,8 @@ object AreaTop3RoadFlowAnalyze extends Constants {
     * @return (areaId,row)
     */
   def getInfosByDateRDD(sqlContext: SQLContext, taskParam: JSONObject) = {
-    val startDate: String = ParamUtils.getParam(taskParam, PARAM_START_DATE)
-    val endDate: String = ParamUtils.getParam(taskParam, PARAM_END_DATE)
+    val startDate: String = ParamUtils.getParam(taskParam, Constants.PARAM_START_DATE)
+    val endDate: String = ParamUtils.getParam(taskParam, Constants.PARAM_END_DATE)
     val sql = "SELECT " + "monitor_id," + "car," + "road_id," + "area_id " + "FROM	monitor_flow_action " + "WHERE date >= '" + startDate + "'" + "AND date <= '" + endDate + "'"
     val df: DataFrame = sqlContext.sql(sql)
     df.rdd.map(row => {

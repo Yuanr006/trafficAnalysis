@@ -1,4 +1,4 @@
-package org.qphone.scala.Utils
+package cn.qphone.spark.util
 
 object NumberUtils {
 
