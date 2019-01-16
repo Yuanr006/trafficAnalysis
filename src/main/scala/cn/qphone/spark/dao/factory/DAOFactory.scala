@@ -1,7 +1,7 @@
 package cn.qphone.spark.dao.factory
 
-import cn.qphone.spark.dao.impl.TaskDAOImpl
-import cn.qphone.spark.dao.ITaskDAO
+import cn.qphone.spark.dao.impl.{MonitorDAOImpl, TaskDAOImpl}
+import cn.qphone.spark.dao.{IMonitorDAO, ITaskDAO}
 
 /**
   * @Auther: zhuguangyuan 1159814737@qq.com
@@ -11,5 +11,8 @@ import cn.qphone.spark.dao.ITaskDAO
 object DAOFactory {
   def getTaskDAO():ITaskDAO = {
     new TaskDAOImpl()
+  }
+  def getMonitorDAO():IMonitorDAO={
+    new MonitorDAOImpl()
   }
 }
