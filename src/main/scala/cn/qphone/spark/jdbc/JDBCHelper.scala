@@ -88,14 +88,14 @@ object JDBCHelper {
     rtn
   }
 
-  def executeBatch(sql:String,paramsList:List[Array[Object]]): Unit ={
+  def executeBatch(sql:String,paramsList:List[Array[String]]): Unit ={
     val conn = getJdbcConn()
     conn.setAutoCommit(false)
     val prep = conn.prepareStatement(sql)
     if(paramsList!=null && paramsList.length>0){
       for (params <- paramsList) {
         for(i <- 0 to params.length-1) {
-          prep.setObject(i+1,params(i))
+          prep.setString(i+1,params(i))
         }
         prep.addBatch()
       }
