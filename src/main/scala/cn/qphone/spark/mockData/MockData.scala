@@ -1,14 +1,13 @@
 package cn.qphone.spark.mockData
+import java.time.temporal.{ChronoUnit, Temporal, TemporalUnit}
+import java.util.Date
 
-import java.text.SimpleDateFormat
-
-import cn.qphone.spark.util.{DateUtils, StringUtils}
+import cn.qphone.spark.util.{DateUtils, LocalDateTimeUtils, StringUtils}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
-import scala.collection.immutable.HashMap
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
@@ -18,7 +17,7 @@ import scala.util.Random
   * @Date: 2019/1/14 20:27
   * @Description: 模拟生成离线数据
   */
-object Mockdata {
+object MockData {
   /**
     * 模拟数据 数据格式如下
     * 日期  卡口ID        摄像头编号  车牌号  拍摄时间      车速   道路ID     区域ID
@@ -45,18 +44,22 @@ object Mockdata {
       val carNum: String=locations(random.nextInt(5))+(65+random.nextInt(26)).toChar+StringUtils.fulfuill(5,random.nextInt(100000).toString)
       //baseActionTime 模拟24小时
       //2019-01-01 01
-      var baseActionTime=nowDate+" "+StringUtils.fulfuill(random.nextInt(24).toString);
+      var baseActionTime=nowDate+" "+StringUtils.fulfuill(2,random.nextInt(24).toString);
 
       /**
-        * 焖鸡不同卡扣的不同摄像头的数据
+        * 不同卡扣的不同摄像头的数据
         */
       for(j<-0 to random.nextInt(300)){
         //模拟每个车辆每被30个摄像头拍摄后 时间上累计加1小时。这样做使数据更加真实。
-        if (j%30==0&&j!=0){
-          baseActionTime=nowDate+" "+ StringUtils.fulfuill((baseActionTime.split(" ")(1).trim.toInt+1).toString)
-        }
         //模拟经过此卡扣开始时间 ，如：2018-01-01 20:09:10
-        val actionTime: String=baseActionTime+":"+ StringUtils.fulfuill(random.nextInt(60).toString) + ":"+StringUtils.fulfuill(random.nextInt(60).toString);
+        var actionTime: String=baseActionTime+":"+ StringUtils.fulfuill(2,random.nextInt(60).toString) + ":"+StringUtils.fulfuill(2,random.nextInt(60).toString);
+        if (j%30==0&&j!=0){
+          val now:Date=DateUtils.TIME_FORMAT.parse(actionTime)
+          val tmpdate= LocalDateTimeUtils.convertDateToLDT(now)
+          LocalDateTimeUtils.plus(tmpdate,1L,ChronoUnit.HOURS)
+          actionTime=tmpdate.format(DateUtils.formatter)
+        }
+
         //模拟9个卡扣monitorId，0补全4位
         val monitorId: String=StringUtils.fulfuill(4,random.nextInt(9).toString)
         //模拟速度
@@ -84,8 +87,8 @@ object Mockdata {
       val df: DataFrame=sqlContext.createDataFrame(rdd,struceType)
       df.createOrReplaceTempView("monitor_flow_action")
       //默认打印出来df里面的20行数据
-     println("----打印 车辆信息数据----");
-      df.show()
+    // println("----打印 车辆信息数据----");
+      df.show(1)
 
       /**
         * monitorAndCameras    key：monitor_id
@@ -123,8 +126,8 @@ object Mockdata {
     val rdd2=sc.makeRDD(dataList)
     val df2:DataFrame=sqlContext.createDataFrame(rdd2,structType2)
     df2.createOrReplaceTempView("monitor_camera_info")
-   println("----打印 卡扣号对应摄像头号 数据----")
-    df2.show()
+ //  println("----打印 卡扣号对应摄像头号 数据----")
+    df2.show(1)
 
 
   }
@@ -140,6 +143,7 @@ object Mockdata {
     sc.setLogLevel("DEBUG")
     val sqlContext:SQLContext=new SQLContext(sc)
     mock(sc,sqlContext)
+    sqlContext.sql("select action_time from monitor_flow_action ").rdd.foreach(println)
     sc.stop()
 
   }
