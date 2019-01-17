@@ -1,5 +1,6 @@
 package cn.qphone.spark.rtmroad
 
+import java.sql.{Connection, DriverManager, PreparedStatement}
 import java.text.SimpleDateFormat
 import java.util.{Date, Properties}
 
@@ -66,33 +67,52 @@ object RoadRealTimeAnalyze {
 
     //获取时间格式化器
     val formate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-    result.foreachRDD(rdd => {
-      val date = new Date()
-      //获取当前时间
-      var now = formate.format(date)
-      rdd.foreachPartition(x => {
-        while (x.hasNext) {
-          val info = x.next()
-          //卡扣编号
-          val monitor = info._1
-          //速度总数
-          val speedCount = info._2._1
-          //车辆总数
-          val cars = info._2._2
-          try {
-            //有车通过时
-            println("当前时间：" + now +
-              "卡扣编号：" + monitor +
-              "车辆总数：" + cars +
-              "速度总数：" + speedCount +
-              "平均速度：" + (speedCount / cars))
-          } catch {
-            //没有车通过时
-            case e: ArithmeticException => println("当前时间：" + now + "卡扣编号：" + monitor + " 没有车通过")
-          }
-          println("====================================================================================")
+    result.foreachRDD(rdd=>{
+      def func(rdd:Iterator[(String, (Int, Int))])={
+        var conn : Connection = null
+        var stmt : PreparedStatement = null
+        try{
+          val url = prop.getProperty("jdbc.url")
+          val user = prop.getProperty("jdbc.user")
+          val password = prop.getProperty("jdbc.password")
+          conn = DriverManager.getConnection(url, user, password)
+          val date = new Date()
+          //获取当前时间
+          var now = formate.format(date)
+          rdd.foreach(x=>{
+            //卡扣编号
+            val monitor = x._1
+            //速度总数
+            var speedCount = x._2._1
+            //车辆总数
+            var cars = x._2._2
+            try{
+              //有车通过时
+              println("当前时间：" + now +
+                "卡扣编号：" + monitor +
+                "车辆总数：" + cars +
+                "速度总数：" + speedCount +
+                "平均速度：" + (speedCount / cars))
+            }catch {
+              //没有车通过时
+              case e:ArithmeticException=>println("当前时间："+now+ "卡扣编号："+monitor + " 没有车通过")
+            }
+            println("====================================================================================")
+            val sql = "insert into roadrealtimeanalyze values(?,?,?,?,?)"
+            stmt = conn.prepareStatement(sql)
+            stmt.setString(1, now)
+            stmt.setString(2, monitor)
+            stmt.setString(3, cars.toString)
+            stmt.setString(4, speedCount.toString)
+            stmt.setString(5, (speedCount / cars).toString)
+            stmt.executeUpdate()
+          })
+        }catch {
+          case e: Exception => print()
         }
-      })
+      }
+      val repartitionedRDD = rdd.repartition(5)
+      repartitionedRDD.foreachPartition(func)
     })
   }
 }

@@ -28,7 +28,6 @@ object MockRealTimeData extends Thread{
       while (true) {
         val date = DateUtils.getTodayDate
         var baseActionTime = date + " " + StringUtils.fulfuill(2, random.nextInt(24).toString)
-        baseActionTime = baseActionTime+":"+ StringUtils.fulfuill(2,random.nextInt(60).toString) + ":"+StringUtils.fulfuill(2,random.nextInt(60).toString);
         //拍摄时间
         val actionTime = baseActionTime + ":" + StringUtils.fulfuill(2, random.nextInt(60).toString) + ":" + StringUtils.fulfuill(2, random.nextInt(60).toString)
         //卡口id
@@ -36,7 +35,7 @@ object MockRealTimeData extends Thread{
         //车牌号码
         val car = locations(random.nextInt(10)) + (65 + random.nextInt(26)).asInstanceOf[Char] + StringUtils.fulfuill(5, random.nextInt(99999) + "")
         //车速
-        val speed = StringUtils.fulfuill(3,random.nextInt(260) + "")
+        val speed = StringUtils.fulfuill(random.nextInt(260) + "")
         //道路id
         val roadId = StringUtils.fulfuill(2, random.nextInt(50) + 1 + "")
         //摄像头编号
