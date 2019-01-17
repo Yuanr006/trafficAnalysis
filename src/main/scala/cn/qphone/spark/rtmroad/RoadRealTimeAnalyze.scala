@@ -72,6 +72,7 @@ object RoadRealTimeAnalyze {
         var conn : Connection = null
         var stmt : PreparedStatement = null
         try{
+          //设置连接mysql的属性
           val url = prop.getProperty("jdbc.url")
           val user = prop.getProperty("jdbc.user")
           val password = prop.getProperty("jdbc.password")

@@ -42,6 +42,7 @@ object MockRealTimeData extends Thread{
         val cameraId = StringUtils.fulfuill(5, random.nextInt(9999) + "")
         //区域id
         val areaId = StringUtils.fulfuill(2, random.nextInt(8) + "")
+        //生产消息
         producer.send(new ProducerRecord("test", date + "\t" + monitorId + "\t" + cameraId + "\t" + car + "\t" + actionTime + "\t" + speed + "\t" + roadId + "\t" + areaId))
         println(date + "\t" + monitorId + "\t" + cameraId + "\t" + car + "\t" + actionTime + "\t" + speed + "\t" + roadId + "\t" + areaId)
         //休眠500ms
