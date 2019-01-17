@@ -1,7 +1,5 @@
 package cn.qphone.spark.dao.impl
 
-import java.util
-
 import cn.qphone.spark.bean.{MonitorState, TopNMonitor2CarCount, TopNMonitorDetailInfo}
 import cn.qphone.spark.dao.IMonitorDAO
 import cn.qphone.spark.jdbc.JDBCHelper
@@ -20,7 +18,7 @@ class MonitorDAOImpl extends IMonitorDAO{
     * @param topNMonitor2CarCounts
     */
   override def insertBatchTopN(topNMonitor2CarCounts: List[TopNMonitor2CarCount]): Unit =  {
-    val sql = "INSERT INTO topn_monitor_car_count VALUES(?,?,?)";
+    val sql = "INSERT INTO topn_monitor_car_count VALUES(?,?,?)"
     val params = new ListBuffer[Array[String]]
     for ( topNMonitor2CarCount <- topNMonitor2CarCounts) {
       val arr = ArrayBuffer[String]()
@@ -38,7 +36,14 @@ class MonitorDAOImpl extends IMonitorDAO{
     *
     * @param monitorDetailInfos
     */
-  override def insertBatchMonitorDetails(monitorDetailInfos: List[TopNMonitorDetailInfo]): Unit = ???
+  override def insertBatchMonitorDetails(monitorDetailInfos: List[TopNMonitorDetailInfo]): Unit = {
+    val sql = "INSERT INTO topn_monitor_detail_info VALUES(?,?,?,?,?,?,?,?)"
+    val params = new ListBuffer[Array[String]]()
+    for( m <- monitorDetailInfos){
+      params.append(Array[String](m.taskId.toString,m.date,m.monitorId,m.cameraId,m.car,m.actionTime,m.speed,m.roadId))
+    }
+    JDBCHelper.executeBatch(sql, params.toList)
+  }
 
   /**
     * 卡口状态信息插入到数据库
@@ -58,5 +63,12 @@ override def insertMonitorState(monitorState: MonitorState): Unit = {
   params.append(param)
   JDBCHelper.executeBatch(sql, params.toList)
 }
-override def insertBatchTop10Details(topNMonitorDetailInfos: List[TopNMonitorDetailInfo]): Unit = ???
+override def insertBatchTop10Details(topNMonitorDetailInfos: List[TopNMonitorDetailInfo]): Unit = {
+  val sql = "INSERT INTO top10_speed_detail VALUES(?,?,?,?,?,?,?,?)"
+  val params = ListBuffer[Array[String]]()
+  for( m <- topNMonitorDetailInfos){
+    params.append(Array[String](m.taskId.toString,m.date,m.monitorId,m.cameraId,m.car,m.actionTime,m.speed,m.roadId))
+  }
+  JDBCHelper.executeBatch(sql, params.toList)
+}
 }
