@@ -1,12 +1,14 @@
 package cn.qphone.spark.skynet
 
-import cn.qphone.spark.bean.{MonitorState, TopNMonitor2CarCount}
+import java.text.SimpleDateFormat
+
+import cn.qphone.spark.bean.{MonitorState, TopNMonitor2CarCount, TopNMonitorDetailInfo}
 import cn.qphone.spark.constant.Constants
 import cn.qphone.spark.dao.factory.DAOFactory
 import cn.qphone.spark.mockData.MockData
 import cn.qphone.spark.util.ParamUtils
 import com.alibaba.fastjson.{JSON, JSONObject}
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -35,7 +37,10 @@ object MonitorFlowAnalyze{
     val task = taskDAO.findTaskById(taskId)
     val taskParamsJsonObject = JSON.parseObject(task.taskParams)
 //    monitorState(sqlContext,sc,taskParamsJsonObject,taskId)
-    topnMonitorcarcount(sqlContext,sc,taskParamsJsonObject,taskId)
+//    topnMonitorCarCount(sqlContext,sc,taskParamsJsonObject,taskId)
+//    topnMonitorDetailInfo(sqlContext,sc,taskParamsJsonObject,taskId)
+//    areaCarPeng(sqlContext,sc,taskParamsJsonObject,taskId)
+    CarPeng(sqlContext,sc,taskParamsJsonObject,taskId,"01","02")
   }
   def monitorState(sqlContext:SQLContext,sc:SparkContext,taskParamsJsonObject:JSONObject,taskId:Int): Unit ={
     /**
@@ -93,7 +98,7 @@ object MonitorFlowAnalyze{
     val monitorDAO = DAOFactory.getMonitorDAO()
     monitorDAO.insertMonitorState(monitorState)
   }
-  def topnMonitorcarcount(sqlContext:SQLContext,sc:SparkContext,taskParamsJsonObject:JSONObject,taskId:Int): Unit ={
+  def topnMonitorCarCount(sqlContext:SQLContext,sc:SparkContext,taskParamsJsonObject:JSONObject,taskId:Int): Unit ={
     val topnnum = ParamUtils.getParam(taskParamsJsonObject, Constants.FIELD_TOP_NUM).toInt
     val sql = "SELECT * FROM monitor_flow_action"
     val rdd1 = sqlContext.sql(sql).rdd
@@ -103,10 +108,88 @@ object MonitorFlowAnalyze{
       val topNMonitor2CarCount = new TopNMonitor2CarCount(taskId,x._1,x._2.toString)
       array.append(topNMonitor2CarCount)
     })
-    saveTopnMonitorcarcount(array)
+    saveTopnMonitorCarCount(array)
   }
-  def saveTopnMonitorcarcount(topn_monitorcarcount:ArrayBuffer[TopNMonitor2CarCount]): Unit ={
+  def saveTopnMonitorCarCount(topn_monitorcarcount:ArrayBuffer[TopNMonitor2CarCount]): Unit ={
     val monitorDAO = DAOFactory.getMonitorDAO()
     monitorDAO.insertBatchTopN(topn_monitorcarcount.toList)
+  }
+  def topnMonitorDetailInfo(sqlContext:SQLContext,sc:SparkContext,taskParamsJsonObject:JSONObject,taskId:Int): Unit ={
+    val topnnum = ParamUtils.getParam(taskParamsJsonObject, Constants.FIELD_TOP_NUM).toInt
+    val sql = "SELECT * FROM monitor_flow_action where speed>120"
+    val rdd1 = sqlContext.sql(sql).rdd.map(x=>(x.getString(1),x)).groupByKey().sortBy(_._2.size).take(topnnum)
+    val topnbuffer = ArrayBuffer[Row]()
+    val top10buffer = ArrayBuffer[Row]()
+    for (elem <- rdd1) {
+      val buffer1 = ArrayBuffer[(Int,Row)]()
+      for (elem <- elem._2) {
+        topnbuffer.append(elem)
+        buffer1.append((elem.getString(5).toInt,elem))
+      }
+      buffer1.sortBy(_._1).reverse.take(10).map(_._2).foreach(top10buffer.append(_))
+    }
+    val top10list = ListBuffer[TopNMonitorDetailInfo]()
+    val topnlist = ListBuffer[TopNMonitorDetailInfo]()
+    for (elem <- topnbuffer) {
+      topnlist.append(new TopNMonitorDetailInfo(taskId,elem.getString(0),elem.getString(1),elem.getString(2)
+        ,elem.getString(3),elem.getString(4),elem.getString(5),elem.getString(6)))
+    }
+    for (elem <- top10buffer) {
+      top10list.append(new TopNMonitorDetailInfo(taskId,elem.getString(0),elem.getString(1),elem.getString(2)
+        ,elem.getString(3),elem.getString(4),elem.getString(5),elem.getString(6)))
+    }
+    saveTopnMonitorDetailInfo(topnlist)
+    saveTop10SpeedDetaileInfo(top10list)
+  }
+  def saveTopnMonitorDetailInfo(list:ListBuffer[TopNMonitorDetailInfo]): Unit ={
+    val monitorDAO = DAOFactory.getMonitorDAO()
+    monitorDAO.insertBatchMonitorDetails(list.toList)
+  }
+  def saveTop10SpeedDetaileInfo(list:ListBuffer[TopNMonitorDetailInfo]): Unit ={
+    val monitorDAO = DAOFactory.getMonitorDAO()
+    monitorDAO.insertBatchTop10Details(list.toList)
+  }
+  def areaCarPeng(sqlContext:SQLContext,sc:SparkContext,taskParamsJsonObject:JSONObject,taskId:Int): Unit = {
+    val monitorIds1 = List("0000", "0001", "0002", "0003")
+    val monitorIds2 = List("0004", "0005", "0006", "0007")
+    val startTime = ParamUtils.getParam(taskParamsJsonObject, Constants.PARAM_START_DATE);
+    val endTime = ParamUtils.getParam(taskParamsJsonObject, Constants.PARAM_END_DATE);
+    val rdd1 = sqlContext.sql(jointsql(monitorIds1,startTime,endTime)).rdd.map(_.getString(3)).distinct()
+    val rdd2 = sqlContext.sql(jointsql(monitorIds2,startTime,endTime)).rdd.map(_.getString(3)).distinct()
+    rdd1.intersection(rdd2).foreach(println)
+  }
+  def jointsql(monitorIds1:List[String],startTime:String,endTime:String): String ={
+    var sql = "SELECT * "+ "FROM monitor_flow_action"+ " WHERE date >='" + startTime + "' "+ " AND date <= '" + endTime+ "' "+ " AND monitor_id in ("
+    for( i <- 0 until monitorIds1.length){
+      sql += "'"+monitorIds1(i) + "'"
+      if( i  < monitorIds1.length - 1 ){
+        sql += ","
+      }
+    }
+    sql += ")"
+    sql
+  }
+  def CarPeng(sqlContext:SQLContext,sc:SparkContext,taskParamsJsonObject:JSONObject,taskId:Int,area1:String,area2:String): Unit ={
+    val startDate = ParamUtils.getParam(taskParamsJsonObject, Constants.PARAM_START_DATE)
+    val endDate = ParamUtils.getParam(taskParamsJsonObject, Constants.PARAM_END_DATE)
+    val sql1 = "SELECT * "+ "FROM monitor_flow_action "+ "WHERE date>='" + startDate + "' "+ "AND date<='" + endDate + "'"+ "AND area_id in ('"+area1 +"')"
+    val sql2 = "SELECT * "+ "FROM monitor_flow_action "+ "WHERE date>='" + startDate + "' "+ "AND date<='" + endDate + "'"+ "AND area_id in ('"+area2 +"')"
+    val rdd1 = sqlContext.sql(sql1).rdd.map(x=>(x.getString(3),x)).groupByKey()
+    val rdd2 = sqlContext.sql(sql2).rdd.map(x=>(x.getString(3),x)).groupByKey()
+    rdd1.join(rdd2).map(x=>{
+      val arr1 = x._2._1.toArray
+      val arr2 = x._2._2.toArray
+      val buff = ListBuffer[(Row,Row)]()
+      for (i <-0 until arr1.length) {
+        val timestamp1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(arr1(i).getString(4)).getTime
+        for (j <-0 until arr2.length) {
+          val timestamp2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(arr2(j).getString(4)).getTime
+          if((timestamp1-timestamp2).abs<=3600000){
+            buff.append((arr1(i),arr2(j)))
+          }
+        }
+      }
+      buff
+    }).saveAsTextFile("e://opt")
   }
 }
